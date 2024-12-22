@@ -267,3 +267,15 @@ std::vector<torch::optim::OptimizerParamGroup> TCNNWP::OptimParamGroups() {
 void TCNNWP::Reset() {
   CHECK(false) << "This should be handled by the parent module";
 }
+
+// 추가: Query 함수 정의
+Tensor TCNNWP::Query(const Tensor& pts, const Tensor& anchors) {
+    CHECK(false) << "Query with anchors is not implemented";
+    return Tensor();
+}
+
+// 추가: AnchoredQuery 함수 정의
+Tensor TCNNWP::AnchoredQuery(const Tensor& coords, const Tensor& anchors) {
+    CHECK(false) << "AnchoredQuery is not implemented";
+    return Tensor();
+}

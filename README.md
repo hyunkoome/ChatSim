@@ -57,6 +57,13 @@ pip install -r requirements.txt
 imageio_download_bin freeimage
 ```
 
+Taking `torch-2.1.0+cu121` for example.
+```shell
+pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu121
+pip install -r requirements.txt
+imageio_download_bin freeimage
+```
+
 The installation is the same as [F2-NeRF](https://github.com/totoro97/f2-nerf). Please go through the following steps.
 
 ```bash
@@ -78,6 +85,22 @@ For Arch based Linux distributions:
 sudo pacman -S zlib
 ```
 
+Check OS
+```shell
+cat /etc/os-release
+```
+if you can see `ID_LIKE=debian`, you must install as follows: 
+```shell
+sudo apt install zlib1g-dev
+```
+ubuntu should be debian.
+
+```shell
+sudo apt install zlib1g-dev
+```
+
+
+
 #### Step 2.2: Download pre-compiled LibTorch
 Taking `torch-1.13.1+cu117` for example.
 ```bash
@@ -90,10 +113,39 @@ unzip ./libtorch-cxx11-abi-shared-with-deps-1.13.1+cu117.zip
 rm ./libtorch-cxx11-abi-shared-with-deps-1.13.1+cu117.zip
 ```
 
+Taking `torch-2.1.0+cu121` for example.
+```shell
+cd chatsim/background/mcnerf
+cd External
+
+# modify the verison if you use a different pytorch installation
+wget https://download.pytorch.org/libtorch/cu121/libtorch-cxx11-abi-shared-with-deps-2.1.0%2Bcu121.zip
+unzip ./libtorch-cxx11-abi-shared-with-deps-2.1.0+cu121.zip 
+rm ./libtorch-cxx11-abi-shared-with-deps-2.1.0+cu121.zip
+```
+
 #### Step 2.3: Compile
 The lowest g++ version is 7.5.0. 
+
+check g++ version
 ```shell
-cd ..
+g++ --version
+```
+
+yaml-cpp 라이브러리 생성:
+```shell
+cd External/yaml-cpp
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Debug
+make
+
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make
+```
+
+
+```shell
+cd chatsim/background/mcnerf
 cmake . -B build
 cmake --build build --target main --config RelWithDebInfo -j
 ```
@@ -225,6 +277,40 @@ echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.clou
 sudo apt-get update && sudo apt-get install google-cloud-cli # for clash proxy user, you may need https://blog.csdn.net/m0_53694308/article/details/134874757
 gcloud init # login
 ```
+
+```shell
+gsutil -m cp -r \
+  "gs://waymo_open_dataset_v_1_4_3/individual_files/testing" \
+  .
+  
+  
+ gsutil -m cp -r \
+  "gs://waymo_open_dataset_v_1_4_3/individual_files/validation" \
+  .
+  
+gsutil -m cp -r \
+  "gs://waymo_open_dataset_v_1_4_3/individual_files/testing" \
+  .
+  
+gsutil -m cp -r \
+  "gs://waymo_open_dataset_v_1_4_3/individual_files/testing_3d_camera_only_detection" \
+  .
+  
+gsutil -m cp -r \
+  "gs://waymo_open_dataset_v_1_4_3/individual_files/domain_adaptation" \
+  .
+```
+
+```shell
+cd data_utils
+bash link_tfrecods.sh
+```
+Otherwise, delete all symbolic links in the current folder.
+```shell
+find . -type l -exec unlink {} \;
+```
+
+
 </details>
 
 <details>
@@ -295,7 +381,12 @@ We extract the images, camera poses, LiDAR file, etc. out of the tfrecord files 
 cd data_utils
 python process_waymo_script.py --waymo_data_dir=../data/waymo_tfrecords/1.4.2 --nerf_data_dir=../data/waymo_multi_view
 ```
-This will generate the data folder `data/waymo_multi_view`. 
+This will generate the data folder `data/waymo_multi_view`.
+
+```shell
+cd data
+ln -s /home/hyunkoo/DATA/NAS/nfsRoot/Datasets/Waymo_Datasets/ChatSim/waymo_multi_view waymo_multi_view
+```
 
 #### Recalibrate Waymo data
 <details> <summary><span style="font-weight: bold;">Download our recalibrated files</span></summary>
@@ -390,6 +481,11 @@ rm -rf Blender_3D_assets
 mv assets blender_assets
 ```
 
+```shell
+cd data
+ln -s /home/hyunkoo/Dataset/NAS/nfsRoot/Datasets/Waymo_Datasets/ChatSim/Blender_3D_assets/assets blender_assets
+```
+
 Our 3D models are collected from the Internet. We tried our best to contact the author of the model and ensure that copyright issues are properly dealt with (our open-source projects are not for profit). If you are the author of a model and our behaviour infringes your copyright, please contact us immediately and we will delete the model.
 
 #### Download Skydome HDRI
@@ -400,6 +496,11 @@ git lfs install
 git clone https://huggingface.co/datasets/yifanlu/Skydome_HDRI
 mv Skydome_HDRI/waymo_skydome ./
 rm -rf Skydome_HDRI
+```
+
+```shell
+cd data
+ln -s /home/hyunkoo/Dataset/NAS/nfsRoot/Datasets/Waymo_Datasets/ChatSim/Skydome_HDRI/waymo_skydome waymo_skydome
 ```
 
 You can also train the skydome estimation network yourself. Go to `chatsim/foreground/mclight/skydome_lighting` and follow `chatsim/foreground/mclight/skydome_lighting/readme.md` for the training.

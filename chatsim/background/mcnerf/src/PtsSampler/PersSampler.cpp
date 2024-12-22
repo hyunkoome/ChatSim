@@ -1,7 +1,8 @@
 //
 // Created by ppwang on 2022/9/26.
 //
-
+#include <fstream>
+#include <iostream>  // 필요한 경우 추가
 #include <random>
 #include <algorithm>
 #include "../Utils/Utils.h"
