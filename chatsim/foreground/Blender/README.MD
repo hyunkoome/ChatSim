@@ -19,6 +19,7 @@ locate the internal Python of Blender, for example `chatsim/foreground/Blender/b
 
 ```
 export blender_py=$PWD/blender-3.5.1-linux-x64/3.5/python/bin/python3.10
+export blender_py=/home/hyunkoo/DATA/HDD8TB/Add_Objects_DrivingScense/ChatSim/chatsim/foreground/Blender/blender-3.5.1-linux-x64/3.5/python/bin/python3.10
 
 cd utils
 

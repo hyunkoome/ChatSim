@@ -214,7 +214,8 @@ We tested with [Blender 3.5.1](https://download.blender.org/release/Blender3.5/b
 
 #### Step 4.1: Install Blender software
 ```bash
-cd ../../Blender
+#cd ../../Blender
+cd ../../../foreground/Blender/
 wget https://download.blender.org/release/Blender3.5/blender-3.5.1-linux-x64.tar.xz
 tar -xvf blender-3.5.1-linux-x64.tar.xz
 rm blender-3.5.1-linux-x64.tar.xz
@@ -228,17 +229,24 @@ export blender_py=$PWD/blender-3.5.1-linux-x64/3.5/python/bin/python3.10
 
 cd utils
 
+# 패키지 설치
+$blender_py -m pip install --upgrade pip setuptools
+$blender_py -m pip install -r requirements.txt
+
 # install dependency (use the -i https://pypi.tuna.tsinghua.edu.cn/simple if you are in the Chinese mainland)
-$blender_py -m pip install -r requirements.txt 
+# 중국 PyPI 미러를 사용해야 하는 경우
 $blender_py -m pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
+# 개발 모드 설치
 $blender_py setup.py develop
+cd ../../
 ```
 
 ## Step 5: Setup Trajectory Tracking Module (optional)
 If you want to get smoother and more realistic trajectories, you can install the trajectory module and change the parameter `motion_agent-motion_tracking` to True in .yaml file. For installation (both code and pre-trained model), you can run the following commands in the terminal. This requires Pytorch >= 1.13.
 ```bash
-pip install frozendict gym==0.26.2 stable-baselines3[extra] protobuf==3.20.1
+#pip install frozendict gym==0.26.2 stable-baselines3[extra] protobuf==3.20.1
+pip install frozendict gym==0.26.2 stable-baselines3[extra] protobuf==3.19.6
 
 cd chatsim/foreground
 git clone --recursive git@github.com:MARMOTatZJU/drl-based-trajectory-tracking.git -b v1.0.0
@@ -401,7 +409,6 @@ unzip recalibrated_poses.zip
 rsync -av recalibrated_poses/ waymo_multi_view/
 rm -r recalibrated_poses*
 
-
 # if you use 3D Guassian Splatting, you also need to download following files
 # calibration files using colmap, also point cloud for 3DGS training
 # you can also go to https://huggingface.co/datasets/yifanlu/waymo_recalibrated_poses_colmap/tree/main to download mannually
@@ -412,6 +419,13 @@ tar xvf waymo_recalibrated_poses_colmap.tar
 cd ..
 rsync -av waymo_recalibrated_poses_colmap/waymo_multi_view/ waymo_multi_view/
 rm -rf waymo_recalibrated_poses_colmap
+```
+
+In my case
+```shell
+rsync -av /home/hyunkoo/Dataset/NAS/nfsRoot/Datasets/Waymo_Datasets/ChatSim/recalibrated_poses_for_metashape/recalibrated_poses/ /home/hyunkoo/Dataset/NAS/nfsRoot/Datasets/Waymo_Datasets/ChatSim/waymo_multi_view/
+
+rsync -av /home/hyunkoo/Dataset/NAS/nfsRoot/Datasets/Waymo_Datasets/ChatSim/waymo_recalibrated_poses_colmap_for_3DGS/waymo_multi_view/ /home/hyunkoo/Dataset/NAS/nfsRoot/Datasets/Waymo_Datasets/ChatSim/waymo_multi_view/
 ```
 
 </details>
@@ -488,7 +502,7 @@ ln -s /home/hyunkoo/Dataset/NAS/nfsRoot/Datasets/Waymo_Datasets/ChatSim/Blender_
 
 Our 3D models are collected from the Internet. We tried our best to contact the author of the model and ensure that copyright issues are properly dealt with (our open-source projects are not for profit). If you are the author of a model and our behaviour infringes your copyright, please contact us immediately and we will delete the model.
 
-#### Download Skydome HDRI
+[#### Download Skydome HDRI]()
 - [Skydome HDRI](https://huggingface.co/datasets/yifanlu/Skydome_HDRI/tree/main). Download with the following command and make sure they are in `data/waymo_skydome`. 
 ```bash
 # suppose you are in ChatSim/data
@@ -517,6 +531,13 @@ cd chatsim/background/mcnerf
 ```
 Make sure you have the `data` folder linking to `../../../data`. If haven't, run `ln -s ../../../data data`.
 Then train your model with 
+
+Create results directories
+```shell
+cd chatsim/background/mcnerf
+ln -s /home/hyunkoo/DATA/NAS/nfsRoot/Train_Results/ChatSim/mcnerf/outputs outputs
+ln -s /home/hyunkoo/DATA/NAS/nfsRoot/Train_Results/ChatSim/mcnerf/exp exp
+```
 
 ```bash
 python scripts/run.py --config-name=wanjinyou_big \

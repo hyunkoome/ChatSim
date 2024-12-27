@@ -57,7 +57,16 @@ dataset
 └── holicity_pano_sky_resized_64_mask 
 ```
 
+```shell
+ln -s /home/hyunkoo/Dataset/NAS/nfsRoot/Datasets/Waymo_Datasets/ChatSim/skydome_lighting_dataset/dataset dataset
+```
 ## Usage
+
+Create log dir and link 
+```shell
+cd foreground/mclight/skydome_lighting/mc_to_sky
+ln -s /home/hyunkoo/Dataset/NAS/nfsRoot/Train_Results/ChatSim/skydome_lighting/logs logs
+```
 
 ### Stage 1: Train LDR to HDR autoencoder
 **Train**
@@ -68,7 +77,10 @@ python mc_to_sky/tools/train.py -y mc_to_sky/config/stage1/skymodel_peak_residua
 Then we use the trained model to predict pseduo HDRI GT for HoliCity dataset. You can find a `config.yaml` and the best checkpoint inside the log folder, we denote them `STAGE_1_CONFIG` and `STAGE_1_BEST_CKPT` respectively.
 
 ```bash
-python mc_to_sky/tools/holicity/holicity_generate_gt.py -y mc_to_sky/config/stage1/skymodel_peak_residual.yaml -c STAGE_1_BEST_CKPT --target_dir dataset/holicity_pano_hdr 
+python mc_to_sky/tools/holicity/holicity_generate_gt.py -y mc_to_sky/config/stage1/skymodel_peak_residual.yaml -c STAGE_1_BEST_CKPT --target_dir dataset/holicity_pano_hdr
+
+python mc_to_sky/tools/holicity/holicity_generate_gt.py -y mc_to_sky/config/stage1/skymodel_peak_residual.yaml -c /home/hyunkoo/DATA/HDD8TB/Add_Objects_DrivingScense/ChatSim/chatsim/foreground/mclight/skydome_lighting/mc_to_sky/logs/stage1_recon_pano_peak_residual_wb_adjust_1222_234457/lightning_logs/version_0/checkpoints/epoch=369-val_loss=1.25.ckpt --target_dir dataset/holicity_pano_hdr
+ 
 ```
 Now `dataset/holicity_pano_hdr` stores the pseduo HDRI GT for holicity dataset.
 
@@ -78,6 +90,7 @@ You can validate and test your checkpoint by
 
 ```bash
 python mc_to_sky/tools/test.py -y mc_to_sky/config/stage1/skymodel_peak_residual.yaml -c STAGE_1_BEST_CKPT
+python mc_to_sky/tools/test.py -y mc_to_sky/config/stage1/skymodel_peak_residual.yaml -c /home/hyunkoo/DATA/HDD8TB/Add_Objects_DrivingScense/ChatSim/chatsim/foreground/mclight/skydome_lighting/mc_to_sky/logs/stage1_recon_pano_peak_residual_wb_adjust_1222_234457/lightning_logs/version_0/checkpoints/epoch=369-val_loss=1.25.ckpt
 ```
 results are stored in `<logdir>/lightning_logs/version_i/visualization`
 
@@ -93,6 +106,10 @@ python mc_to_sky/tools/train.py -y mc_to_sky/config/stage2/multi_view_avg.yaml
 You can also validate and test your checkpoint by
 ```bash
 python mc_to_sky/tools/test.py -y mc_to_sky/config/stage2/multi_view_avg.yaml -c STAGE_2_BEST_CKPT
+
+python mc_to_sky/tools/test.py -y mc_to_sky/config/stage2/multi_view_avg.yaml -c /home/hyunkoo/DATA/HDD8TB/Add_Objects_DrivingScense/ChatSim/chatsim/foreground/mclight/skydome_lighting/mc_to_sky/logs/stage2_multi_camera_hdri_prediction_1223_201420/lightning_logs/version_0/checkpoints/epoch=89-val_loss=0.13.ckpt
+
+
 ```
 where `STAGE_2_BEST_CKPT` refers to the new training log's best checkpoint.
 
@@ -101,6 +118,12 @@ where `STAGE_2_BEST_CKPT` refers to the new training log's best checkpoint.
 We directly adopt the model trained on HoliCity for the inference on Waymo dataset.
 ```bash
 python mc_to_sky/tools/infer.py -y mc_to_sky/config/stage2/multi_view_avg.yaml -c STAGE_2_BEST_CKPT -i IMAGE_FOLDER -o OUPUT_FOLDER
+
+python mc_to_sky/tools/infer.py -y mc_to_sky/config/stage2/multi_view_avg.yaml \
+-c /home/hyunkoo/DATA/HDD8TB/Add_Objects_DrivingScense/ChatSim/chatsim/foreground/mclight/skydome_lighting/mc_to_sky/logs/stage2_multi_camera_hdri_prediction_1223_201420/lightning_logs/version_0/checkpoints/epoch=89-val_loss=0.13.ckpt \
+-i /home/hyunkoo/DATA/HDD8TB/Add_Objects_DrivingScense/ChatSim/data/waymo_multi_view/segment-1172406780360799916_1660_000_1680_000_with_camera_labels/images \
+-o /home/hyunkoo/DATA/HDD8TB/Add_Objects_DrivingScense/ChatSim/data/waymo_multi_view/segment-1172406780360799916_1660_000_1680_000_with_camera_labels/images_skydome
+
 ```
 
 The `IMAGE_FOLDER` should contain continuous image data, for example, pictures from three views should be put together and follow the order in `STAGE_2_CONFIG['view_setting']['view_dis']`. Note that `IMAGE_FOLDER` can include multiple frames, an examplar image sequence can be `[frame_1_front, frame_1_front_left, frame_1_front_right, frame_2_front, frame_2_front_left, frame_2_front_right, ...]`. For our waymo dataset, you can point `IMAGE_FOLDER` to `data/waymo_multi_view/$SCENE_NAME/images` in our ChatSim.
@@ -109,7 +132,26 @@ The `IMAGE_FOLDER` should contain continuous image data, for example, pictures f
 We further provide `mc_to_sky/tools/infer_waymo_batch.py` which add another loop on the scene-level. 
 ```bash
 python mc_to_sky/tools/infer_waymo_batch.py -y mc_to_sky/config/stage2/multi_view_avg.yaml -c STAGE_2_BEST_CKPT --waymo_scenes_dir WAYMO_SCENE_DIR -o OUPUT_FOLDER
+
+python mc_to_sky/tools/infer_waymo_batch.py \
+-y mc_to_sky/config/stage2/multi_view_avg.yaml \
+-c /home/hyunkoo/DATA/HDD8TB/Add_Objects_DrivingScense/ChatSim/chatsim/foreground/mclight/skydome_lighting/mc_to_sky/logs/stage2_multi_camera_hdri_prediction_1223_201420/lightning_logs/version_0/checkpoints/epoch=89-val_loss=0.13.ckpt \
+-w /home/hyunkoo/DATA/HDD8TB/Add_Objects_DrivingScense/ChatSim/data/waymo_multi_view \
+-o /home/hyunkoo/DATA/NAS/nfsRoot/Datasets/Waymo_Datasets/ChatSim/waymo_multi_view_hdr_skydome
 ```
+
+- `/home/hyunkoo/DATA/NAS/nfsRoot/Datasets/Waymo_Datasets/ChatSim/waymo_multi_view_hdr_skydome` 여기서 생성된 파일들은 ..
+- 여기 [Download Skydome HDRI](../../../../README.md)에서 아래(`https://huggingface.co/datasets/yifanlu/Skydome_HDRI`)에서 다운로드 한, 파일과 동일함
+- 따라서, `ln -s` 명령어를 통해서 링크.. 하길...
+```shell
+cd $ChatSim_HOME
+cd data
+ 
+cd /home/hyunkoo/DATA/HDD8TB/Add_Objects_DrivingScense/ChatSim/data
+ln -s /home/hyunkoo/DATA/NAS/nfsRoot/Datasets/Waymo_Datasets/ChatSim/waymo_multi_view_hdr_skydome waymo_skydome
+```
+
+
 where we suppose the `WAYMO_SCENE_DIR` have the following structure
 ```
 WAYMO_SCENE_DIR
