@@ -281,3 +281,15 @@ runtime_config.yaml
 build/
 /tags
 /bazel-*
+/chatsim/background/mcnerf/External/yaml-cpp/build/
+
+
+####################3
+tiny-cuda-nn
+
+.DS_Store
+*.egg-info
+__pycache__
+build*
+dist
+/.vscode
