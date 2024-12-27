@@ -293,3 +293,8 @@ __pycache__
 build*
 dist
 /.vscode
+
+logs
+
+/chatsim/foreground/mclight/skydome_lighting/dataset/
+/chatsim/foreground/mclight/skydome_lighting/mc_to_sky/logs/
