@@ -309,3 +309,5 @@ diff_rasterization/dist
 tensorboard_3d
 screenshots
 data
+
+/chatsim/background/gaussian-splatting/submodules/simple-knn/build
