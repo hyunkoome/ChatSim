@@ -298,3 +298,14 @@ logs
 
 /chatsim/foreground/mclight/skydome_lighting/dataset/
 /chatsim/foreground/mclight/skydome_lighting/mc_to_sky/logs/
+
+/chatsim/background/gaussian-splatting/submodules/simple-knn/build/
+*.pyc
+.vscode
+output
+build
+diff_rasterization/diff_rast.egg-info
+diff_rasterization/dist
+tensorboard_3d
+screenshots
+data
