@@ -285,8 +285,6 @@ build/
 
 
 ####################3
-tiny-cuda-nn
-
 .DS_Store
 *.egg-info
 __pycache__

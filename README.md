@@ -245,8 +245,8 @@ cd ../../
 ## Step 5: Setup Trajectory Tracking Module (optional)
 If you want to get smoother and more realistic trajectories, you can install the trajectory module and change the parameter `motion_agent-motion_tracking` to True in .yaml file. For installation (both code and pre-trained model), you can run the following commands in the terminal. This requires Pytorch >= 1.13.
 ```bash
-#pip install frozendict gym==0.26.2 stable-baselines3[extra] protobuf==3.20.1
-pip install frozendict gym==0.26.2 stable-baselines3[extra] protobuf==3.19.6
+pip install frozendict gym==0.26.2 stable-baselines3[extra] protobuf==3.20.1
+#pip install frozendict gym==0.26.2 stable-baselines3[extra] protobuf==3.19.6
 
 cd chatsim/foreground
 git clone --recursive git@github.com:MARMOTatZJU/drl-based-trajectory-tracking.git -b v1.0.0
@@ -546,10 +546,23 @@ exp_name=${EXP_NAME} dataset.shutter_coefficient=0.15 mode=train_hdr_shutter +wo
 ```
 where `${CASE_NAME}` are those like `segment-11379226583756500423_6230_810_6250_810_with_camera_labels` and `${EXP_NAME}` can be anything like `exp_coeff_0.15`. `dataset.shutter_coefficient = 0.15` or `dataset.shutter_coefficient = 0.3` work well.
 
-You can simply run scripts like `bash train-1137.sh` for training and `bash render_novel_view-1137.sh` for testing. 
+You can simply run scripts like `bash train-1137.sh` for training and `bash render_novel_view-1137.sh` for testing.
+
+You can simply run scripts like `bash train_or_render.sh train` for training and `bash train_or_render.sh render` for testing.
+
+For training 
+```shell
+cd chatsim/background/mcnerf
+bash train_or_render.sh train
+```
+
+For testing 
+```shell
+cd chatsim/background/mcnerf
+bash train_or_render.sh render
+```
+
 </details>
-
-
 <details> <summary><span style="font-weight: bold;">Train 3D Gaussian Splatting</span></summary>
 
 ```bash
@@ -597,6 +610,12 @@ You can try
 python main.py -y config/waymo-1137.yaml -p "Add a Benz G in front of me, driving away fast."
 # if you train 3DGS
 python main.py -y config/3dgs-waymo-1137.yaml -p "Add a Benz G in front of me, driving away fast."
+```
+
+```shell
+cd ChatSim
+ln -s /home/hyunkoo/DATA/NAS/nfsRoot/Train_Results/ChatSim/chatsim_results results
+bash scripts/run_main.sh /home/hyunkoo/DATA/HDD8TB/Add_Objects_DrivingScense/ChatSim/.env
 ```
 
 The rendered results are saved in `results/1137_demo_%Y_%m_%d_%H_%M_%S`. Intermediate files are saved in `results/cache/1137_demo_%Y_%m_%d_%H_%M_%S` for debug and visualization if `save_cache` are enabled in `config/waymo-1137.yaml`.

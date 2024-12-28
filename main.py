@@ -1,4 +1,11 @@
 import argparse
+import os
+from dotenv import load_dotenv
+
+# load_dotenv('.huggingface_env2')
+load_dotenv('/home/hyunkoo/DATA/HDD8TB/Add_Objects_DrivingScense/ChatSim/.env')
+print(os.environ['OPENAI_API_KEY'])
+
 import openai
 from termcolor import colored
 import imageio.v2 as imageio
