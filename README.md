@@ -60,7 +60,7 @@ imageio_download_bin freeimage
 Taking `torch-2.1.0+cu121` for example.
 ```shell
 pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu121
-pip install -r requirements.txt
+pip install -r requirements.txt --force-reinstall --no-deps
 imageio_download_bin freeimage
 ```
 
@@ -142,7 +142,6 @@ make
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make
 ```
-
 
 ```shell
 cd chatsim/background/mcnerf
@@ -268,9 +267,7 @@ If you want to train the skydome model, follow the README in `chatsim/foreground
 
 #### Download and extract Waymo data
 ```bash
-mkdir data
-mkdir data/waymo_tfrecords
-mkdir data/waymo_tfrecords/1.4.2
+mkdir -p data/waymo_tfrecords/1.4.2
 ```
 Download the [waymo perception dataset v1.4.2](https://waymo.com/open/download/) to the `data/waymo_tfrecords/1.4.2`. In the google cloud console, the correct folder path is `waymo_open_dataset_v_1_4_2/individual_files/training` or `waymo_open_dataset_v_1_4_2/individual_files/validation`. Some static scenes we have used are listed here.  Use `Filter` to find them quickly, or use [gcloud](https://cloud.google.com/storage/docs/discover-object-storage-gcloud) to download them in batch.
 

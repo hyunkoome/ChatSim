@@ -2,23 +2,23 @@
 
 # file_list 배열 선언
 file_list=(
-   "segment-11379226583756500423_6230_810_6250_810_with_camera_labels"
-   "segment-12879640240483815315_5852_605_5872_605_with_camera_labels"
-   "segment-14424804287031718399_1281_030_1301_030_with_camera_labels"
-   "segment-17761959194352517553_5448_420_5468_420_with_camera_labels"
-   "segment-14333744981238305769_5658_260_5678_260_with_camera_labels"
-   "segment-16470190748368943792_4369_490_4389_490_with_camera_labels"
-   "segment-4058410353286511411_3980_000_4000_000_with_camera_labels"
-   "segment-13196796799137805454_3036_940_3056_940_with_camera_labels"
-   "segment-10247954040621004675_2180_000_2200_000_with_camera_labels"
-   "segment-13469905891836363794_4429_660_4449_660_with_camera_labels"
-   "segment-1172406780360799916_1660_000_1680_000_with_camera_labels"
-   "segment-10061305430875486848_1080_000_1100_000_with_camera_labels"
-   "segment-14869732972903148657_2420_000_2440_000_with_camera_labels"
-   "segment-16646360389507147817_3320_000_3340_000_with_camera_labels"
-   "segment-13238419657658219864_4630_850_4650_850_with_camera_labels"
-   "segment-15270638100874320175_2720_000_2740_000_with_camera_labels"
-   "segment-15349503153813328111_2160_000_2180_000_with_camera_labels"
+#   "segment-11379226583756500423_6230_810_6250_810_with_camera_labels"
+#   "segment-12879640240483815315_5852_605_5872_605_with_camera_labels"
+#   "segment-14424804287031718399_1281_030_1301_030_with_camera_labels"
+#   "segment-17761959194352517553_5448_420_5468_420_with_camera_labels"
+#   "segment-14333744981238305769_5658_260_5678_260_with_camera_labels"
+#   "segment-16470190748368943792_4369_490_4389_490_with_camera_labels"
+#   "segment-4058410353286511411_3980_000_4000_000_with_camera_labels"
+#   "segment-13196796799137805454_3036_940_3056_940_with_camera_labels"
+#   "segment-10247954040621004675_2180_000_2200_000_with_camera_labels"
+#   "segment-13469905891836363794_4429_660_4449_660_with_camera_labels"
+#   "segment-1172406780360799916_1660_000_1680_000_with_camera_labels"
+#   "segment-10061305430875486848_1080_000_1100_000_with_camera_labels"
+#   "segment-14869732972903148657_2420_000_2440_000_with_camera_labels"
+#   "segment-16646360389507147817_3320_000_3340_000_with_camera_labels"
+#   "segment-13238419657658219864_4630_850_4650_850_with_camera_labels"
+#   "segment-15270638100874320175_2720_000_2740_000_with_camera_labels"
+#   "segment-15349503153813328111_2160_000_2180_000_with_camera_labels"
    "segment-15868625208244306149_4340_000_4360_000_with_camera_labels"
    "segment-16608525782988721413_100_000_120_000_with_camera_labels"
    "segment-3425716115468765803_977_756_997_756_with_camera_labels"
@@ -44,7 +44,7 @@ if [[ "$mode" == "train" ]]; then
     for case_name in "${file_list[@]}"
     do
         echo "Running case: $case_name"
-        python scripts/run.py --config-name=wanjinyou_big \
+        CUDA_VISIBLE_DEVICES=1 python scripts/run.py --config-name=wanjinyou_big \
             dataset_name=waymo_multi_view case_name=$case_name \
             exp_name=exp_coeff_0.3 dataset.shutter_coefficient=0.3 mode=train_hdr_shutter +work_dir=$(pwd)
     done
@@ -53,7 +53,7 @@ elif [[ "$mode" == "render" ]]; then
     for case_name in "${file_list[@]}"
     do
         echo "Running case: $case_name"
-        python scripts/run.py --config-name=wanjinyou_big \
+        CUDA_VISIBLE_DEVICES=1 python scripts/run.py --config-name=wanjinyou_big \
             dataset_name=waymo_multi_view case_name=$case_name \
             exp_name=exp_coeff_0.3 mode=render_wide_angle_hdr_shutter is_continue=true +work_dir=$(pwd)
     done

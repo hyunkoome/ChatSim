@@ -46,6 +46,14 @@ gdown
 plyfile
 tensorboard
 gsplat
-protobuf==3.19.6 #3.20.1
+gym==0.26.2
+stable-baselines3[extra]
+protobuf==3.19.6 #3.20.1  # Required for stable-baselines3; conflicts with tensorflow but works for this project, #3.19.6
 openai
 python-dotenv
+aiohttp
+multidict
+# pip install -r requirements.txt
+# 설치 후
+# pip install protobuf==3.20.1
+# 로 설치 해줘야 함

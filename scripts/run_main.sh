@@ -25,7 +25,21 @@ fi
 # PYTHONPATH 확인 (디버깅용)
 echo "PYTHONPATH after setup-minimum.sh: $PYTHONPATH"
 
+# .env 파일 경로 설정
+ENV_PATH="/home/hyunkoo/DATA/HDD8TB/Journal/ChatSim/.env"
+
+# .env 파일에서 환경 변수 불러오기
+if [ -f "$ENV_PATH" ]; then
+  echo "Loading environment variables from $ENV_PATH"
+  export $(grep -v '^#' "$ENV_PATH" | xargs)
+else
+  echo "Error: .env file not found at $ENV_PATH"
+  exit 1
+fi
+
 # Python 실행 명령어
 #python main.py -y config/waymo-1137.yaml -p "Add a Benz G in front of me, driving away fast." -s "demo_hkkim"
 
 python main.py -y config/waymo-1137.yaml -p "Create a traffic jam." -s "demo_hkkim"
+
+#python main.py -y config/3dgs-waymo-1137.yaml -p "Add a Benz G in front of me, driving away fast."
