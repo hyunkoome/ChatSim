@@ -1,8 +1,9 @@
 kornia==0.5.0
 transformers
 torchmetrics
-opencv_contrib_python==4.8.1.78
-opencv_python_headless==4.8.1.78
+#opencv_python==4.7.0.72 #4.8.1.78
+opencv_contrib_python==4.7.0.72 #4.8.1.78
+opencv_python_headless==4.7.0.72 #4.8.1.78
 tensorflow==2.11.0
 waymo-open-dataset-tf-2-11-0==1.6.1
 pytorch_lightning==2.0.3
@@ -45,3 +46,14 @@ gdown
 plyfile
 tensorboard
 gsplat
+gym==0.26.2
+stable-baselines3[extra]
+protobuf==3.19.6 #3.20.1  # Required for stable-baselines3; conflicts with tensorflow but works for this project, #3.19.6
+openai
+python-dotenv
+aiohttp
+multidict
+# pip install -r requirements.txt
+# 설치 후
+# pip install protobuf==3.20.1
+# 로 설치 해줘야 함

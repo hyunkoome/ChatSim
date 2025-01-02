@@ -15,6 +15,14 @@ public:
 
   Tensor Query(const Tensor& pts) override;
 
+  // 필요하지 않은 AnchoredQuery를 명시적으로 구현하여 경고 제거
+//  Tensor AnchoredQuery(const Tensor& coords, const Tensor& anchors) override {
+//    CHECK(false) << "AnchoredQuery is not implemented in TCNNWP";
+//    return Tensor();
+//  }
+  virtual Tensor Query(const Tensor& pts, const Tensor& anchors) override;  // 추가 및 명시적 virtual
+  virtual Tensor AnchoredQuery(const Tensor& coords, const Tensor& anchors) override;  // 추가 및 명시적 virtual
+
   int LoadStates(const std::vector<Tensor>& states, int idx) override;
   std::vector<Tensor> States() override;
   std::vector<torch::optim::OptimizerParamGroup> OptimParamGroups() override;

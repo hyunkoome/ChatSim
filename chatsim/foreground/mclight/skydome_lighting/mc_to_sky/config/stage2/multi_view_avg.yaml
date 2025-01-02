@@ -40,7 +40,8 @@ model:
 
   sky_model:
     core_method: sky_model_enhanced
-    ckpt_path: "YOUR CKPT HERE, ENDED WITH .ckpt"
+    ckpt_path: "/home/hyunkoo/DATA/HDD8TB/Journal/ChatSim/chatsim/foreground/mclight/skydome_lighting/mc_to_sky/logs/stage1_recon_pano_peak_residual_wb_adjust_1222_234457/lightning_logs/version_0/checkpoints/epoch=369-val_loss=1.25.ckpt"
+    #ckpt_path: "YOUR CKPT HERE, ENDED WITH .ckpt"
 
   latent_predictor:
     name: avg_multi_view

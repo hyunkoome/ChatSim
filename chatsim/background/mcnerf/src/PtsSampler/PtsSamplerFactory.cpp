@@ -10,4 +10,7 @@ std::unique_ptr<PtsSampler> ConstructPtsSampler(GlobalDataPool* global_data_pool
     return std::make_unique<PersSampler>(global_data_pool);
   }
   CHECK(false) << "No such pts sampler.";
+
+  // 명시적으로 nullptr 반환
+  return nullptr;
 }

@@ -57,6 +57,13 @@ pip install -r requirements.txt
 imageio_download_bin freeimage
 ```
 
+Taking `torch-2.1.0+cu121` for example.
+```shell
+pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu121
+pip install -r requirements.txt --force-reinstall --no-deps
+imageio_download_bin freeimage
+```
+
 The installation is the same as [F2-NeRF](https://github.com/totoro97/f2-nerf). Please go through the following steps.
 
 ```bash
@@ -78,6 +85,22 @@ For Arch based Linux distributions:
 sudo pacman -S zlib
 ```
 
+Check OS
+```shell
+cat /etc/os-release
+```
+if you can see `ID_LIKE=debian`, you must install as follows: 
+```shell
+sudo apt install zlib1g-dev
+```
+ubuntu should be debian.
+
+```shell
+sudo apt install zlib1g-dev
+```
+
+
+
 #### Step 2.2: Download pre-compiled LibTorch
 Taking `torch-1.13.1+cu117` for example.
 ```bash
@@ -90,10 +113,38 @@ unzip ./libtorch-cxx11-abi-shared-with-deps-1.13.1+cu117.zip
 rm ./libtorch-cxx11-abi-shared-with-deps-1.13.1+cu117.zip
 ```
 
+Taking `torch-2.1.0+cu121` for example.
+```shell
+cd chatsim/background/mcnerf
+cd External
+
+# modify the verison if you use a different pytorch installation
+wget https://download.pytorch.org/libtorch/cu121/libtorch-cxx11-abi-shared-with-deps-2.1.0%2Bcu121.zip
+unzip ./libtorch-cxx11-abi-shared-with-deps-2.1.0+cu121.zip 
+rm ./libtorch-cxx11-abi-shared-with-deps-2.1.0+cu121.zip
+```
+
 #### Step 2.3: Compile
 The lowest g++ version is 7.5.0. 
+
+check g++ version
 ```shell
-cd ..
+g++ --version
+```
+
+yaml-cpp 라이브러리 생성:
+```shell
+cd External/yaml-cpp
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Debug
+make
+
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make
+```
+
+```shell
+cd chatsim/background/mcnerf
 cmake . -B build
 cmake --build build --target main --config RelWithDebInfo -j
 ```
@@ -162,7 +213,8 @@ We tested with [Blender 3.5.1](https://download.blender.org/release/Blender3.5/b
 
 #### Step 4.1: Install Blender software
 ```bash
-cd ../../Blender
+#cd ../../Blender
+cd ../../../foreground/Blender/
 wget https://download.blender.org/release/Blender3.5/blender-3.5.1-linux-x64.tar.xz
 tar -xvf blender-3.5.1-linux-x64.tar.xz
 rm blender-3.5.1-linux-x64.tar.xz
@@ -176,17 +228,24 @@ export blender_py=$PWD/blender-3.5.1-linux-x64/3.5/python/bin/python3.10
 
 cd utils
 
+# 패키지 설치
+$blender_py -m pip install --upgrade pip setuptools
+$blender_py -m pip install -r requirements.txt
+
 # install dependency (use the -i https://pypi.tuna.tsinghua.edu.cn/simple if you are in the Chinese mainland)
-$blender_py -m pip install -r requirements.txt 
+# 중국 PyPI 미러를 사용해야 하는 경우
 $blender_py -m pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
+# 개발 모드 설치
 $blender_py setup.py develop
+cd ../../
 ```
 
 ## Step 5: Setup Trajectory Tracking Module (optional)
 If you want to get smoother and more realistic trajectories, you can install the trajectory module and change the parameter `motion_agent-motion_tracking` to True in .yaml file. For installation (both code and pre-trained model), you can run the following commands in the terminal. This requires Pytorch >= 1.13.
 ```bash
 pip install frozendict gym==0.26.2 stable-baselines3[extra] protobuf==3.20.1
+#pip install frozendict gym==0.26.2 stable-baselines3[extra] protobuf==3.19.6
 
 cd chatsim/foreground
 git clone --recursive git@github.com:MARMOTatZJU/drl-based-trajectory-tracking.git -b v1.0.0
@@ -208,9 +267,7 @@ If you want to train the skydome model, follow the README in `chatsim/foreground
 
 #### Download and extract Waymo data
 ```bash
-mkdir data
-mkdir data/waymo_tfrecords
-mkdir data/waymo_tfrecords/1.4.2
+mkdir -p data/waymo_tfrecords/1.4.2
 ```
 Download the [waymo perception dataset v1.4.2](https://waymo.com/open/download/) to the `data/waymo_tfrecords/1.4.2`. In the google cloud console, the correct folder path is `waymo_open_dataset_v_1_4_2/individual_files/training` or `waymo_open_dataset_v_1_4_2/individual_files/validation`. Some static scenes we have used are listed here.  Use `Filter` to find them quickly, or use [gcloud](https://cloud.google.com/storage/docs/discover-object-storage-gcloud) to download them in batch.
 
@@ -225,6 +282,40 @@ echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.clou
 sudo apt-get update && sudo apt-get install google-cloud-cli # for clash proxy user, you may need https://blog.csdn.net/m0_53694308/article/details/134874757
 gcloud init # login
 ```
+
+```shell
+gsutil -m cp -r \
+  "gs://waymo_open_dataset_v_1_4_3/individual_files/testing" \
+  .
+  
+  
+ gsutil -m cp -r \
+  "gs://waymo_open_dataset_v_1_4_3/individual_files/validation" \
+  .
+  
+gsutil -m cp -r \
+  "gs://waymo_open_dataset_v_1_4_3/individual_files/testing" \
+  .
+  
+gsutil -m cp -r \
+  "gs://waymo_open_dataset_v_1_4_3/individual_files/testing_3d_camera_only_detection" \
+  .
+  
+gsutil -m cp -r \
+  "gs://waymo_open_dataset_v_1_4_3/individual_files/domain_adaptation" \
+  .
+```
+
+```shell
+cd data_utils
+bash link_tfrecods.sh
+```
+Otherwise, delete all symbolic links in the current folder.
+```shell
+find . -type l -exec unlink {} \;
+```
+
+
 </details>
 
 <details>
@@ -295,7 +386,12 @@ We extract the images, camera poses, LiDAR file, etc. out of the tfrecord files 
 cd data_utils
 python process_waymo_script.py --waymo_data_dir=../data/waymo_tfrecords/1.4.2 --nerf_data_dir=../data/waymo_multi_view
 ```
-This will generate the data folder `data/waymo_multi_view`. 
+This will generate the data folder `data/waymo_multi_view`.
+
+```shell
+cd data
+ln -s /home/hyunkoo/DATA/NAS/nfsRoot/Datasets/Waymo_Datasets/ChatSim/waymo_multi_view waymo_multi_view
+```
 
 #### Recalibrate Waymo data
 <details> <summary><span style="font-weight: bold;">Download our recalibrated files</span></summary>
@@ -310,7 +406,6 @@ unzip recalibrated_poses.zip
 rsync -av recalibrated_poses/ waymo_multi_view/
 rm -r recalibrated_poses*
 
-
 # if you use 3D Guassian Splatting, you also need to download following files
 # calibration files using colmap, also point cloud for 3DGS training
 # you can also go to https://huggingface.co/datasets/yifanlu/waymo_recalibrated_poses_colmap/tree/main to download mannually
@@ -321,6 +416,13 @@ tar xvf waymo_recalibrated_poses_colmap.tar
 cd ..
 rsync -av waymo_recalibrated_poses_colmap/waymo_multi_view/ waymo_multi_view/
 rm -rf waymo_recalibrated_poses_colmap
+```
+
+In my case
+```shell
+rsync -av /home/hyunkoo/Dataset/NAS/nfsRoot/Datasets/Waymo_Datasets/ChatSim/recalibrated_poses_for_metashape/recalibrated_poses/ /home/hyunkoo/Dataset/NAS/nfsRoot/Datasets/Waymo_Datasets/ChatSim/waymo_multi_view/
+
+rsync -av /home/hyunkoo/Dataset/NAS/nfsRoot/Datasets/Waymo_Datasets/ChatSim/waymo_recalibrated_poses_colmap_for_3DGS/waymo_multi_view/ /home/hyunkoo/Dataset/NAS/nfsRoot/Datasets/Waymo_Datasets/ChatSim/waymo_multi_view/
 ```
 
 </details>
@@ -390,9 +492,14 @@ rm -rf Blender_3D_assets
 mv assets blender_assets
 ```
 
+```shell
+cd data
+ln -s /home/hyunkoo/Dataset/NAS/nfsRoot/Datasets/Waymo_Datasets/ChatSim/Blender_3D_assets/assets blender_assets
+```
+
 Our 3D models are collected from the Internet. We tried our best to contact the author of the model and ensure that copyright issues are properly dealt with (our open-source projects are not for profit). If you are the author of a model and our behaviour infringes your copyright, please contact us immediately and we will delete the model.
 
-#### Download Skydome HDRI
+[#### Download Skydome HDRI]()
 - [Skydome HDRI](https://huggingface.co/datasets/yifanlu/Skydome_HDRI/tree/main). Download with the following command and make sure they are in `data/waymo_skydome`. 
 ```bash
 # suppose you are in ChatSim/data
@@ -400,6 +507,11 @@ git lfs install
 git clone https://huggingface.co/datasets/yifanlu/Skydome_HDRI
 mv Skydome_HDRI/waymo_skydome ./
 rm -rf Skydome_HDRI
+```
+
+```shell
+cd data
+ln -s /home/hyunkoo/Dataset/NAS/nfsRoot/Datasets/Waymo_Datasets/ChatSim/Skydome_HDRI/waymo_skydome waymo_skydome
 ```
 
 You can also train the skydome estimation network yourself. Go to `chatsim/foreground/mclight/skydome_lighting` and follow `chatsim/foreground/mclight/skydome_lighting/readme.md` for the training.
@@ -417,6 +529,13 @@ cd chatsim/background/mcnerf
 Make sure you have the `data` folder linking to `../../../data`. If haven't, run `ln -s ../../../data data`.
 Then train your model with 
 
+Create results directories
+```shell
+cd chatsim/background/mcnerf
+ln -s /home/hyunkoo/DATA/NAS/nfsRoot/Train_Results/ChatSim/mcnerf/outputs outputs
+ln -s /home/hyunkoo/DATA/NAS/nfsRoot/Train_Results/ChatSim/mcnerf/exp exp
+```
+
 ```bash
 python scripts/run.py --config-name=wanjinyou_big \
 dataset_name=waymo_multi_view case_name=${CASE_NAME} \
@@ -424,10 +543,23 @@ exp_name=${EXP_NAME} dataset.shutter_coefficient=0.15 mode=train_hdr_shutter +wo
 ```
 where `${CASE_NAME}` are those like `segment-11379226583756500423_6230_810_6250_810_with_camera_labels` and `${EXP_NAME}` can be anything like `exp_coeff_0.15`. `dataset.shutter_coefficient = 0.15` or `dataset.shutter_coefficient = 0.3` work well.
 
-You can simply run scripts like `bash train-1137.sh` for training and `bash render_novel_view-1137.sh` for testing. 
+You can simply run scripts like `bash train-1137.sh` for training and `bash render_novel_view-1137.sh` for testing.
+
+You can simply run scripts like `bash train_or_render.sh train` for training and `bash train_or_render.sh render` for testing.
+
+For training 
+```shell
+cd chatsim/background/mcnerf
+bash train_or_render.sh train
+```
+
+For testing 
+```shell
+cd chatsim/background/mcnerf
+bash train_or_render.sh render
+```
+
 </details>
-
-
 <details> <summary><span style="font-weight: bold;">Train 3D Gaussian Splatting</span></summary>
 
 ```bash
@@ -475,6 +607,12 @@ You can try
 python main.py -y config/waymo-1137.yaml -p "Add a Benz G in front of me, driving away fast."
 # if you train 3DGS
 python main.py -y config/3dgs-waymo-1137.yaml -p "Add a Benz G in front of me, driving away fast."
+```
+
+```shell
+cd ChatSim
+ln -s /home/hyunkoo/DATA/NAS/nfsRoot/Train_Results/ChatSim/chatsim_results results
+bash scripts/run_main.sh /home/hyunkoo/DATA/HDD8TB/Add_Objects_DrivingScense/ChatSim/.env
 ```
 
 The rendered results are saved in `results/1137_demo_%Y_%m_%d_%H_%M_%S`. Intermediate files are saved in `results/cache/1137_demo_%Y_%m_%d_%H_%M_%S` for debug and visualization if `save_cache` are enabled in `config/waymo-1137.yaml`.
